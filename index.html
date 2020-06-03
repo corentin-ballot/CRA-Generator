@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de CRA - LynkOnePartner</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
+            <div class="col-xl-4 col-md-5">
+                <div class="card ">
+                    <div class="card-header">
+                        <img class="w-75 d-block mx-auto" src="logo.png" alt="LynkOnePartner">
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-sm" id="lastname" placeholder="Nom">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-sm" id="firstname"
+                                    placeholder="Prénom">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-sm" id="compagny"
+                                    placeholder="Raison Sociale">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-sm" id="client"
+                                    placeholder="Client">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <select id="month" class="form-control form-control-sm"></select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <select id="year" class="form-control form-control-sm"></select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-primary" id="generate">Générer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form - Selects -->
+    <script>
+        var today = new Date();
+        // Months
+        var mselect = document.querySelector('#month');
+        var mall = document.createElement('option'); mall.innerText = 'Tous les mois'; mall.setAttribute('value', '*');
+        // mselect.appendChild(mall);
+        for (var m = 0; m < 12; m++) {
+            var month = new Date(today.getFullYear(), m).toLocaleDateString('fr-FR', { month: 'long' });
+            month = month.charAt(0).toUpperCase() + month.slice(1).toLowerCase();
+            var option = document.createElement('option');
+            option.innerText = month; option.setAttribute('value', m);
+            if (today.getMonth() === m) option.setAttribute('selected', 'true')
+            mselect.appendChild(option);
+        }
+        // Years
+        var yselect = document.querySelector('#year');
+        for (var y = 0; y <= 5; y++) {
+            var option = document.createElement('option');
+            option.innerText = today.getFullYear() + y;
+            if (today.getFullYear() === y) option.setAttribute('selected', 'true')
+            yselect.appendChild(option);
+        }
+        // Get cookies
+        if(document.cookie.includes('firstname')) document.querySelector('#firstname').value = document.cookie.match(/firstname=([^;]*)/)[1];
+        if(document.cookie.includes('lastname')) document.querySelector('#lastname').value = document.cookie.match(/lastname=([^;]*)/)[1];
+        if(document.cookie.includes('compagny')) document.querySelector('#compagny').value = document.cookie.match(/compagny=([^;]*)/)[1];
+        if(document.cookie.includes('client')) document.querySelector('#client').value = document.cookie.match(/client=([^;]*)/)[1];
+    </script>
+
+    <!-- Date prototype override -->
+    <script>
+        /**
+         * Source: https://stackoverflow.com/a/9608670
+		 */
+        Date.prototype.getWeekOfMonth = function (exact) {
+            var month = this.getMonth()
+                , year = this.getFullYear()
+                , firstWeekday = new Date(year, month, 1).getDay()
+                , lastDateOfMonth = new Date(year, month + 1, 0).getDate()
+                , offsetDate = this.getDate() + (firstWeekday === 0 ? firstWeekday + 7 : firstWeekday) - 2 // Hack for months starting by sunday
+                , index = 1 // start index at 0 or 1, your choice
+                , week = index + Math.floor(offsetDate / 7)
+                ;
+            return week;
+        };
+
+		/**
+         * Source: https://codes-sources.commentcamarche.net/source/16245-calcul-des-jours-feries 
+		 */
+        Date.prototype.isUnworked = function () {
+            var month = this.getMonth(),
+                year = this.getFullYear(),
+                day = this.getDate();
+
+            var G = year % 19
+            var C = Math.floor(year / 100)
+            var H = (C - Math.floor(C / 4) - Math.floor((8 * C + 13) / 25) + 19 * G + 15) % 30
+            var I = H - Math.floor(H / 28) * (1 - Math.floor(H / 28) * Math.floor(29 / (H + 1)) * Math.floor((21 - G) / 11))
+            var J = (year * 1 + Math.floor(year / 4) + I + 2 - C + Math.floor(C / 4)) % 7
+            var L = I - J
+            var MoisPaques = 3 + Math.floor((L + 40) / 44)
+            var JourPaques = L + 28 - 31 * Math.floor(MoisPaques / 4)
+
+            var unworked = [
+                new Date(year, "00", "01"), // Jouryear
+                new Date(year, "04", "01"), // FeteTravail
+                new Date(year, "04", "08"), // Victoire1945
+                new Date(year, "06", "14"), // FeteNationale
+                new Date(year, "07", "15"), // Assomption
+                new Date(year, "10", "01"), // Toussaint
+                new Date(year, "10", "11"), // Armistice
+                new Date(year, "11", "25"), // Noel
+                // new Date(year, "11", "26"), // SaintEtienne
+                new Date(year, MoisPaques - 1, JourPaques), // Paques
+                // new Date(year, MoisPaques-1, JourPaques-2), // VendrediSaint
+                new Date(year, MoisPaques - 1, JourPaques + 1), // LundiPaques
+                new Date(year, MoisPaques - 1, JourPaques + 39), // Ascension
+                new Date(year, MoisPaques - 1, JourPaques + 49), // Pentecote
+                new Date(year, MoisPaques - 1, JourPaques + 50), // LundiPentecote
+            ]
+
+            return unworked.filter((d) => d.getMonth() === month && d.getFullYear() === year && d.getDate() === day).length > 0;
+        }
+    </script>
+
+    <!-- XLSX Generator -->
+    <script type="text/javascript" src="jszip.js"></script>
+    <script type="text/javascript" src="FileSaver.js"></script>
+    <script type="text/javascript" src="myexcel.js"></script>
+    <script>
+        document.querySelector('#generate').addEventListener('click', function () {
+            // Get form values
+            var firstname = document.querySelector('#firstname').value;
+            var lastname = document.querySelector('#lastname').value;
+            var compagny = document.querySelector('#compagny').value;
+            var client = document.querySelector('#client').value;
+            var month = document.querySelector('#month').value;
+            var year = document.querySelector('#year').value;
+
+            // Save values in cookie
+            document.cookie = "firstname="+firstname;
+            document.cookie = "lastname="+lastname;
+            document.cookie = "compagny="+compagny;
+            document.cookie = "client="+client;
+
+            var excel = $JExcel.new("Calibri 11 #333333"); // Default font
+
+            if(month==='*') for (let m = 0; m < 12; m++) computeMonth(m,year,m);
+            else computeMonth(month,year,0);
+
+            var filename = "CRA";
+            if(month!=='*') {
+                var longmonth = new Date(today.getFullYear(), month).toLocaleDateString('fr-FR', { month: 'long' });
+                longmonth = longmonth.charAt(0).toUpperCase() + longmonth.slice(1).toLowerCase();
+                filename += " " + longmonth;
+            }
+            filename += " " + year + ".xlsx";
+
+            excel.generate(filename);
+
+            function computeMonth(month, year, index) {
+                var date = new Date(year, month);
+                var month = date.getMonth();
+                var dayCount = new Date(year, month + 1, 0).getDate();
+                var weekCount = new Date(year, month + 1, 0).getWeekOfMonth();
+
+                // Sheet name
+                var sname_options = { month: 'long', year: '2-digit' };
+                var sname_date = date.toLocaleDateString('fr-FR', sname_options);
+                // 
+                var r1_options = { month: 'short', year: '2-digit' };
+                var r1_date = date.toLocaleDateString('fr-FR', r1_options).replace(' ', '-');
+
+                if(index>0) excel.addSheet("NEXT");
+                excel.set({ sheet: index, value: sname_date.charAt(0).toUpperCase() + sname_date.slice(1).toLowerCase() });
+
+                excel.set(index, 0, 1, "Consultant");
+                excel.set(index, 0, 2, "Nom : " + lastname);
+                excel.set(index, 0, 3, "Prénom : " + firstname);
+
+                // Week days
+                var day_row = excel.addStyle({
+                    align: "C",
+                    font: "Calibri 11 #FFFFFF B",
+                    fill: "#203864",
+                    border: "none,none,none,thin #333333"
+                });
+                excel.set(index, 1, 5, "L", day_row);
+                excel.set(index, 2, 5, "M", day_row);
+                excel.set(index, 3, 5, "M", day_row);
+                excel.set(index, 4, 5, "J", day_row);
+                excel.set(index, 5, 5, "V", day_row);
+                excel.set(index, 6, 5, "S", day_row);
+                excel.set(index, 7, 5, "D", day_row);
+
+                // Calendar
+                var ouvrable = 0;
+                for (let i = 1; i < dayCount + 1; i++) {
+                    let d = new Date(year, month, i);
+
+                    let col = d.getDay() === 0 ? 7 : d.getDay(),
+                        row = 4 + 2 * d.getWeekOfMonth();
+
+                    // Day number
+                    let style = { align: "C", fill: "#2F5597", border: "thin #333333,thin #333333,medium #333333,thin #333333" };
+                    if (d.getDay() === 0 || d.getDate() === dayCount) style.border = "thin #333333,medium #333333,medium #333333,thin #333333"; // Dimanche
+                    if (d.getDay() === 1 || d.getDate() === 1) style.border = "medium #333333,thin #333333,medium #333333,thin #333333"; // Lundi / Premier jour du mois
+                    excel.set(index, col, row, i, excel.addStyle(style));
+
+                    // Day input
+                    let inputStyle = { align: "C", border: "thin #333333,thin #333333,thin #333333,medium #333333" };
+                    if (d.getDay() === 0 || d.getDate() === dayCount) inputStyle.border = "thin #333333,medium #333333,thin #333333,medium #333333"; // Dimanche
+                    if (d.getDay() === 1 || d.getDate() === 1) inputStyle.border = "medium #333333,thin #333333,thin #333333,medium #333333"; // Lundi / Premier jour du mois
+                    if (d.getDay() === 0 || d.getDay() === 6 || d.isUnworked()) inputStyle.fill = "#BFBFBF"; // Weekend / Férié
+                    else ouvrable++;
+                    excel.set(index, col, row + 1, d.isUnworked() ? "" : 1, excel.addStyle(inputStyle));
+                }
+
+                // Rows count
+                for (let i = 0; i < weekCount; i++) {
+                    excel.set(index, 8, 7 + 2 * i, `=B${8 + 2 * i}+C${8 + 2 * i}+D${8 + 2 * i}+E${8 + 2 * i}+F${8 + 2 * i}`);
+                }
+
+                // Total
+                excel.set(index, 1, 20, "Nombre de Jours", excel.addStyle({ font: 'Calibri 11 #333333 B' }));
+                excel.set(index, 7, 20, "TOTAL", excel.addStyle({ font: 'Calibri 11 #333333 B' }));
+                excel.set(index, 8, 20, "=I8+I10+I12+I14+I16+I18", excel.addStyle({ font: 'Calibri 11 #333333 B' }));
+
+
+                // Jours ouvrables 
+                excel.set(index, 9, 1, r1_date, excel.addStyle({ align: "C", font: 'Calibri 11 #333333 B' }));
+                excel.set(index, 9, 2, ouvrable + ' jours', excel.addStyle({ align: "C", font: "Calibri 8 #333333 I" }));
+
+                // Compagny
+                excel.set(index, 0, 23, "Raison Sociale :");
+                excel.set(index, 1, 23, compagny);
+
+                // Client
+                excel.set(index, 0, 25, "Nom et prénom (Client):");
+                excel.set(index, 1, 25, client);
+
+                // Fill and sign
+                excel.set(index, 0, 28, "Signature :");
+                excel.set(index, 0, 29, "Cachet");
+
+                // Set first column width
+                excel.set(index, 0, undefined, 25);
+
+                excel.addImage(index, 1, 1, 7, 4, "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");
+            }
+        })
+    </script>
+</body>
+
+</html>
