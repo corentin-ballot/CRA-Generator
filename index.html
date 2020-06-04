@@ -34,14 +34,14 @@
                             </div>
                             <div>
                                 <label>Date :</label>
-                            <div class="form-row">
+                                <div class="form-row">
                                     <div class="col-md-6">
-                                    <select id="month" class="form-control form-control-sm"></select>
-                                </div>
+                                        <select id="month" class="form-control form-control-sm"></select>
+                                    </div>
                                     <div class="col-md-6">
-                                    <select id="year" class="form-control form-control-sm"></select>
+                                        <select id="year" class="form-control form-control-sm"></select>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                         </form>
                     </div>
@@ -79,10 +79,10 @@
             yselect.appendChild(option);
         }
         // Get cookies
-        if(document.cookie.includes('firstname')) document.querySelector('#firstname').value = document.cookie.match(/firstname=([^;]*)/)[1];
-        if(document.cookie.includes('lastname')) document.querySelector('#lastname').value = document.cookie.match(/lastname=([^;]*)/)[1];
-        if(document.cookie.includes('compagny')) document.querySelector('#compagny').value = document.cookie.match(/compagny=([^;]*)/)[1];
-        if(document.cookie.includes('client')) document.querySelector('#client').value = document.cookie.match(/client=([^;]*)/)[1];
+        if (document.cookie.includes('firstname')) document.querySelector('#firstname').value = document.cookie.match(/firstname=([^;]*)/)[1];
+        if (document.cookie.includes('lastname')) document.querySelector('#lastname').value = document.cookie.match(/lastname=([^;]*)/)[1];
+        if (document.cookie.includes('compagny')) document.querySelector('#compagny').value = document.cookie.match(/compagny=([^;]*)/)[1];
+        if (document.cookie.includes('client')) document.querySelector('#client').value = document.cookie.match(/client=([^;]*)/)[1];
     </script>
 
     <!-- Date prototype override -->
@@ -156,18 +156,18 @@
             var year = document.querySelector('#year').value;
 
             // Save values in cookie
-            document.cookie = "firstname="+firstname;
-            document.cookie = "lastname="+lastname;
-            document.cookie = "compagny="+compagny;
-            document.cookie = "client="+client;
+            document.cookie = "firstname=" + firstname;
+            document.cookie = "lastname=" + lastname;
+            document.cookie = "compagny=" + compagny;
+            document.cookie = "client=" + client;
 
             var excel = $JExcel.new("Calibri 11 #333333"); // Default font
 
-            if(month==='*') for (let m = 0; m < 12; m++) computeMonth(m,year,m);
-            else computeMonth(month,year,0);
+            if (month === '*') for (let m = 0; m < 12; m++) computeMonth(m, year, m);
+            else computeMonth(month, year, 0);
 
             var filename = "CRA";
-            if(month!=='*') {
+            if (month !== '*') {
                 var longmonth = new Date(today.getFullYear(), month).toLocaleDateString('fr-FR', { month: 'long' });
                 longmonth = longmonth.charAt(0).toUpperCase() + longmonth.slice(1).toLowerCase();
                 filename += " " + longmonth;
@@ -198,7 +198,7 @@
                 var r1_options = { month: 'short', year: '2-digit' };
                 var r1_date = date.toLocaleDateString('fr-FR', r1_options).replace(' ', '-');
 
-                if(index>0) excel.addSheet("NEXT");
+                if (index > 0) excel.addSheet("NEXT");
                 excel.set({ sheet: index, value: sname_date.charAt(0).toUpperCase() + sname_date.slice(1).toLowerCase() });
 
                 excel.set(index, 0, 1, "Consultant");
