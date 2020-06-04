@@ -240,7 +240,7 @@
                     if (d.getDay() === 1 || d.getDate() === 1) inputStyle.border = "medium #333333,thin #333333,thin #333333,medium #333333"; // Lundi / Premier jour du mois
                     if (d.getDay() === 0 || d.getDay() === 6 || d.isUnworked()) inputStyle.fill = "#BFBFBF"; // Weekend / Férié
                     else ouvrable++;
-                    excel.set(index, col, row + 1, d.isUnworked() ? "" : 1, excel.addStyle(inputStyle));
+                    excel.set(index, col, row + 1, (d.getDay() === 0 || d.getDay() === 6 || d.isUnworked()) ? "" : 1, excel.addStyle(inputStyle));
                 }
 
                 // Rows count
