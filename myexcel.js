@@ -115,7 +115,7 @@ $JExcel = {
         'xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" ' +
         'xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main">' +
         '{views}{columns}' +
-        '<sheetData>{rows}</sheetData>{mergeCells}{medias}</worksheet>';
+        '<sheetData>{rows}</sheetData>{mergeCells}{orientation}{medias}</worksheet>';
 
     var templateDrawing = '<xdr:twoCellAnchor editAs="oneCell">' +
         '<xdr:from><xdr:col>{colFrom}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>{rowFrom}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>' +
@@ -173,6 +173,7 @@ $JExcel = {
                             .replace('{columns}', generateColums(sheet.columns))
                             .replace("{rows}", generateRows(sheet.rows, sheet.mergeCells))
                             .replace("{mergeCells}", generateMergeCells(sheet.mergeCells))
+                            .replace("{orientation}", generateOrientation(sheet.orientation, sheet.rid))
                             .replace("{medias}", generateMedias(sheet.media));
     }
 
@@ -625,6 +626,12 @@ $JExcel = {
         return s + "</mergeCells>";
     }
 
+    function generateOrientation(orientation, rid) {
+        if (!orientation) return '';
+
+        return '<pageSetup paperSize="9" orientation="'+orientation+'" r:id="'+rid+'"/>';
+    }
+
     function generateMedias(medias) {
         if(!medias) return '';
         var m = "";
@@ -776,6 +783,14 @@ $JExcel = {
 
         excel.freezePane = function (s, x, y) {
             sheets.get(s).freezePane(x, y);
+        }
+
+        excel.setOrientation = function(s, orientation) {
+            if (isObject(s)) return this.setOrientation(s.sheet, orientation);                                           // If using Object form, expand it
+            if (!s) s = 0;                                                                                                       // Use default sheet
+            s = sheets.get(s);
+
+            s.orientation = orientation;
         }
 
         var imagesCount = 0;
